@@ -26,6 +26,15 @@ LinkList initList(){
 
 
 
+typedef struct CNode {
+  ElemType data;
+  struct CNode *next;
+} CNode, *CLinkList ;
+typedef struct CList{
+    CNode first;
+    CNode last;
+    int size;
+}CList;
 
 class solutionNode{
 public:

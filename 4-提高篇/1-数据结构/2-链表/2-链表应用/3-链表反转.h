@@ -29,7 +29,7 @@ public:
     }
     // 递归
     LinkList reverseList_rec(LinkList head){
-
+        
     }
 
     /*首先检查输入的链表头节点 head 是否为空或者只有一个节点。如果是，则直接返回 head，因为这种情况下链表已经是反转的了。

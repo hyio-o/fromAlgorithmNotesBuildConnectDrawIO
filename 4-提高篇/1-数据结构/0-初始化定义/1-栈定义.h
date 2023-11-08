@@ -10,6 +10,7 @@
  * 2 数组栈 == 顺序栈*/
 #define MAXSIZE 210
 typedef char ELemType;
+typedef int Elemtype;
 typedef struct SqStack {
     ELemType data[MAXSIZE];
     int TOP;    // 表示数组地址位置；；

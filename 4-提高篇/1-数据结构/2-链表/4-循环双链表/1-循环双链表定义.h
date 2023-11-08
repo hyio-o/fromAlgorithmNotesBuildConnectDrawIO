@@ -1,6 +1,9 @@
+#include <cstddef>
 #include <iostream>
+#include <system_error>
 using namespace std;
 
+typedef int ELemType;
 struct Node {
     int data;
     Node* prev;
@@ -14,6 +17,8 @@ Node* createNode(int data) {
     newNode->next = nullptr;
     return newNode;
 }
+
+
 
 void insert(int data) {
     Node* head;
@@ -33,6 +38,122 @@ void initializeList(Node** head) {
     *head = createNode(1);
     (*head)->next = (*head);
     (*head)->prev = (*head);
+}
+
+// define cyc
+typedef struct cycDoubNode {
+  ELemType data;
+  struct cycDoubNode *next;
+  struct cycDoubNode *prior;
+  int freq;
+} DoubNode, *DoubList, *cycDoubList;
+
+// cycDoubList init
+void cycDoubListInit(cycDoubList L) {
+  L = (cycDoubNode *)malloc(sizeof(cycDoubNode));
+  L->prior = L->next = L; // 单个循环双链表 init
+}
+
+
+// get length
+int cycGetlen(cycDoubNode* L){
+    int cur_i = 0;
+    cycDoubNode *cur = L->next; // 存在值的节点
+    while (cur != L) {  // 直到 cur.next = NULL, 但是 cur.data 存在
+        cur = cur->next;
+        cur_i++;
+    }
+    return cur_i;
+}
+
+// locate
+cycDoubList cycDoubLocate(cycDoubList L, ELemType x){
+    cycDoubNode *cur = L->next; // find x
+    while (cur->data != x && cur->next != L) {
+        cur = cur->next;
+    }
+    if(cur->data == x)  
+        return cur;
+    else
+        return NULL;;
+}
+// insert cycD
+cycDoubList cycDoubListInsert(cycDoubList L, ELemType x, int n){
+    if(n<1 || n > cycGetlen(L) + 1) return NULL;
+    cycDoubNode *cur = L->next;
+    int cur_i = 1;  // 找到第 n-1 个节点，进行插入
+    while (cur_i < n) { // 如果 n = 5, cur_i = 4时候跳出while
+        cur = cur->next;
+        cur_i++;
+    }
+    cycDoubNode *temp = (cycDoubNode*)malloc(sizeof(cycDoubNode));
+    temp->data = x;
+    // 接下来 insert temp 进 cur 左右  1 2 3 4 5
+    temp->next = cur->next; // cur:4, n=5; temp->5
+    temp->next->prior = temp; //  temp <- 5 ;
+    cur->next = temp;   // 4->temp
+    temp->prior = cur;  // temp->4
+    
+    return L;
+}
+
+DoubList cycInsert_sec(DoubList list, ELemType data, int n){
+    if(list==NULL || n <1)  return list;
+    DoubNode* cur_node = list;
+    int cur_index = 0;
+    while (cur_node != list && cur_index < (n-1)) {
+      // 此时cur_index还没有轮询到第n个节点，继续后移
+      // cur_node != list 还没到最后一个 cur_index < (n-1)
+      cur_node = cur_node->next;
+      cur_index++;
+    }
+    // 判断是否移动到最后一个节点 && 未达到 第n个节点 的要求
+    if(cur_node->next == list){
+        if(cur_index != (n-1))
+            return list;
+    }
+    // 正式开始插入链表节点
+    DoubNode *temp = (DoubNode*)malloc(sizeof(DoubNode));
+    temp->data = data;
+
+    temp->next = cur_node->next;
+    temp->prior = cur_node;
+    cur_node->next->prior = temp;
+    cur_node->next = temp;
+    
+    return list;
+}
+
+// delete cyc删除第n个结点，且将删除的值通过data传出
+ELemType cycDelete_fail(DoubList list, ELemType *data, int n){
+  if (list == NULL || n < 1)
+    return -1;
+  DoubNode *cur_node = list;
+  int cur_index = 0;
+  while (cur_node != list && cur_index < (n - 1)) {
+    // 此时cur_index还没有轮询到第n个节点，继续后移
+    // cur_node != list 还没到最后一个 cur_index < (n-1)
+    cur_node = cur_node->next;
+    cur_index++;
+  }
+  // 判断是否移动到最后一个节点 && 未达到 第n个节点 的要求
+  if (cur_node->next == list) {
+    if (cur_index != (n - 1))
+      return -1;
+  }
+  // 正式删除节点 与 输出该节点值 ; 此时 cur_node 为需要删除&输出的节点
+  DoubNode *temp = cur_node->next;
+  temp->prior->next = cur_node->next;
+}
+
+ELemType cycDelete(DoubNode *L, int n, ELemType *data){
+    DoubNode *pre = L;
+    int pre_i = 0;
+    while(pre_i < n){
+        pre = pre->next;
+        pre_i++;
+        if(pre==L)  return -1;
+    }
 }
 
 int main() {
